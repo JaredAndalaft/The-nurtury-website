@@ -697,13 +697,26 @@
   function restoreSavedImages() {
     var pageKey = getPageKey();
 
+    // Check for baked-in page images from file (used in deployed builds)
+    if (window.NURTURY_PAGE_IMAGES) {
+      var bakedEdits = {};
+      var prefix = pageKey + '::';
+      Object.keys(window.NURTURY_PAGE_IMAGES).forEach(function (key) {
+        if (key.indexOf(prefix) === 0) {
+          bakedEdits[key.substring(prefix.length)] = window.NURTURY_PAGE_IMAGES[key];
+        }
+      });
+      if (Object.keys(bakedEdits).length > 0) {
+        applyImageEdits(bakedEdits);
+      }
+    }
+
+    // Also check IndexedDB for any additional edits
     imgDbGetAllForPage(pageKey, function (imageEdits) {
       if (!imageEdits || Object.keys(imageEdits).length === 0) {
-        // Try migrating old localStorage data
         migrateOldImageData(pageKey);
         return;
       }
-
       applyImageEdits(imageEdits);
     });
   }

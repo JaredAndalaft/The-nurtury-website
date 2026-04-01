@@ -15,7 +15,7 @@
   var STORE_NAME = 'gallery';
   var META_KEY = 'nurtury_gallery_meta';
   var VERSION_KEY = 'nurtury_gallery_version';
-  var GALLERY_VERSION = 4;
+  var GALLERY_VERSION = 5;
 
   var DEFAULT_ITEMS = [
     { id: 1, title: 'Photo 1', category: 'all', color: 'peach', icon: 'camera' },
@@ -167,11 +167,20 @@
   function loadGalleryData(callback) {
     var storedVersion = parseInt(localStorage.getItem(VERSION_KEY)) || 0;
 
+    // Check for baked-in gallery data from file (used in deployed builds)
+    if (window.NURTURY_GALLERY_DATA && storedVersion < GALLERY_VERSION) {
+      galleryItems = window.NURTURY_GALLERY_DATA.slice();
+      dbSaveAll(galleryItems, function () {
+        localStorage.setItem(VERSION_KEY, GALLERY_VERSION);
+        callback();
+      });
+      return;
+    }
+
     // If version is outdated, reset to defaults
     if (storedVersion < GALLERY_VERSION) {
       galleryItems = DEFAULT_ITEMS.slice();
       dbSaveAll(galleryItems, function () {
-        // Clean up old localStorage data if it exists
         localStorage.removeItem('nurtury_gallery');
         callback();
       });
