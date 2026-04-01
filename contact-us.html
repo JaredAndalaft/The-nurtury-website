@@ -75,128 +75,74 @@
   <!-- CONTACT SECTION -->
   <section class="section-padding">
     <div class="container">
-      <div class="grid-2" style="gap:4rem;align-items:start;">
-        <!-- Contact Form -->
-        <div class="fade-in-up">
-          <span class="section-eyebrow">Get in Touch</span>
-          <h2 class="section-title" style="margin-bottom:2rem;">Send Us a Message</h2>
-          <form id="contact-form">
-            <div class="form-group">
-              <label for="cf-name">Parent Name *</label>
-              <input type="text" id="cf-name" name="name" placeholder="Your full name" required>
-              <div class="form-error">Please enter your name</div>
+      <div class="grid-3 fade-in-up">
+        <!-- Contact Cards -->
+        <div style="background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-soft);">
+          <h3 style="margin-bottom:1.25rem;">Contact Information</h3>
+          <div class="contact-card">
+            <div class="contact-card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
             </div>
-            <div class="form-group">
-              <label for="cf-email">Email Address *</label>
-              <input type="email" id="cf-email" name="email" placeholder="your@email.com" required>
-              <div class="form-error">Please enter a valid email address</div>
+            <div>
+              <div class="contact-card__title">Address</div>
+              <div class="contact-card__text">9 Nestadt Street, Rynfield, Benoni, 1514</div>
             </div>
-            <div class="form-group">
-              <label for="cf-phone">Phone Number *</label>
-              <input type="tel" id="cf-phone" name="phone" placeholder="071 234 5678" required>
-              <div class="form-error">Please enter a valid phone number</div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.88.36 1.75.7 2.57.13.32.06.68-.18.92l-1.26 1.26a16 16 0 006 6l1.26-1.26c.24-.24.6-.31.92-.18.82.34 1.69.57 2.57.7A2 2 0 0122 16.92z"/></svg>
             </div>
-            <div class="form-group">
-              <label for="cf-age">Child's Age</label>
-              <input type="text" id="cf-age" name="age" placeholder="e.g. 6 months, 1 year">
+            <div>
+              <div class="contact-card__title">Phone</div>
+              <div class="contact-card__text"><a href="tel:0715787180">071 578 7180</a></div>
             </div>
-            <div class="form-group">
-              <label for="cf-interest">Interested In *</label>
-              <select id="cf-interest" name="interest" required>
-                <option value="">Select a program...</option>
-                <option value="infants">Infants (4 Weeks+)</option>
-                <option value="crawlers">Crawlers</option>
-                <option value="walkers">Walkers</option>
-                <option value="general">General Inquiry</option>
-              </select>
-              <div class="form-error">Please select an option</div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-card__icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
             </div>
-            <div class="form-group">
-              <label for="cf-message">Message *</label>
-              <textarea id="cf-message" name="message" placeholder="Tell us about your child and any questions you have..." rows="5" required></textarea>
-              <div class="form-error">Please enter a message</div>
+            <div>
+              <div class="contact-card__title">Email</div>
+              <div class="contact-card__text"><a href="mailto:info@thenurtury.co.za">info@thenurtury.co.za</a></div>
             </div>
-            <button type="submit" class="btn btn--sage btn--lg" style="width:100%;">Send Message</button>
-          </form>
-          <div class="form-success" id="contact-success">
-            Thank you for contacting us! We'll get back to you within 24 hours.
+          </div>
+          <div class="contact-card" style="margin-bottom:0;">
+            <div class="contact-card__icon" style="background:var(--whatsapp-green);">
+              <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+            </div>
+            <div>
+              <div class="contact-card__title">WhatsApp</div>
+              <div class="contact-card__text"><a href="https://wa.me/27715787180" target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a></div>
+            </div>
           </div>
         </div>
 
-        <!-- Contact Info -->
-        <div class="fade-in-up delay-2">
-          <!-- Contact Cards -->
-          <div style="margin-bottom:2rem;">
-            <h3 style="margin-bottom:1.25rem;">Contact Information</h3>
-
-            <div class="contact-card">
-              <div class="contact-card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <div>
-                <div class="contact-card__title">Address</div>
-                <div class="contact-card__text">9 Nestadt Street, Rynfield, Benoni, 1514</div>
-              </div>
-            </div>
-
-            <div class="contact-card">
-              <div class="contact-card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.88.36 1.75.7 2.57.13.32.06.68-.18.92l-1.26 1.26a16 16 0 006 6l1.26-1.26c.24-.24.6-.31.92-.18.82.34 1.69.57 2.57.7A2 2 0 0122 16.92z"/></svg>
-              </div>
-              <div>
-                <div class="contact-card__title">Phone</div>
-                <div class="contact-card__text"><a href="tel:0715787180">071 578 7180</a></div>
-              </div>
-            </div>
-
-            <div class="contact-card">
-              <div class="contact-card__icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              </div>
-              <div>
-                <div class="contact-card__title">Email</div>
-                <div class="contact-card__text"><a href="mailto:info@thenurtury.co.za">info@thenurtury.co.za</a></div>
-              </div>
-            </div>
-
-            <div class="contact-card" style="margin-bottom:0;">
-              <div class="contact-card__icon" style="background:var(--whatsapp-green);">
-                <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-              </div>
-              <div>
-                <div class="contact-card__title">WhatsApp</div>
-                <div class="contact-card__text"><a href="https://wa.me/27715787180" target="_blank" rel="noopener noreferrer">Chat with us on WhatsApp</a></div>
-              </div>
-            </div>
+        <!-- Hours -->
+        <div style="background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-soft);">
+          <h4 style="margin-bottom:1rem;">Hours of Operation</h4>
+          <div style="display:flex;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #F0F0F0;">
+            <span style="font-weight:700;">Full Day</span>
+            <span style="color:var(--text-body);">6:00 AM – 6:00 PM</span>
           </div>
-
-          <!-- Hours -->
-          <div style="background:var(--white);border-radius:var(--radius-lg);padding:2rem;box-shadow:var(--shadow-soft);margin-bottom:2rem;">
-            <h4 style="margin-bottom:1rem;">Hours of Operation</h4>
-            <div style="display:flex;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #F0F0F0;">
-              <span style="font-weight:700;">Full Day</span>
-              <span style="color:var(--text-body);">6:00 AM – 6:00 PM</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #F0F0F0;">
-              <span style="font-weight:700;">Half Day</span>
-              <span style="color:var(--text-body);">6:00 AM – 2:30 PM</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;padding:0.75rem 0;">
-              <span style="font-weight:700;">Weekends</span>
-              <span style="color:var(--text-muted);">Closed</span>
-            </div>
-            <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.75rem;margin-bottom:0;">Also closed on public holidays and 2–3 weeks over December/January.</p>
+          <div style="display:flex;justify-content:space-between;padding:0.75rem 0;border-bottom:1px solid #F0F0F0;">
+            <span style="font-weight:700;">Half Day</span>
+            <span style="color:var(--text-body);">6:00 AM – 2:30 PM</span>
           </div>
-
-          <!-- Quick CTA -->
-          <div style="background:linear-gradient(135deg, var(--sage), var(--sage-dark));border-radius:var(--radius-lg);padding:2rem;color:white;text-align:center;">
-            <h4 style="color:white;margin-bottom:0.5rem;">Prefer to Call?</h4>
-            <p style="color:rgba(255,255,255,0.9);font-size:0.95rem;margin-bottom:1.25rem;">We're happy to chat and answer any questions.</p>
-            <a href="tel:0715787180" class="btn btn--white">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.88.36 1.75.7 2.57.13.32.06.68-.18.92l-1.26 1.26a16 16 0 006 6l1.26-1.26c.24-.24.6-.31.92-.18.82.34 1.69.57 2.57.7A2 2 0 0122 16.92z"/></svg>
-              071 578 7180
-            </a>
+          <div style="display:flex;justify-content:space-between;padding:0.75rem 0;">
+            <span style="font-weight:700;">Weekends</span>
+            <span style="color:var(--text-muted);">Closed</span>
           </div>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-top:0.75rem;margin-bottom:0;">Also closed on public holidays and 2–3 weeks over December/January.</p>
+        </div>
+
+        <!-- Prefer to Call -->
+        <div style="background:linear-gradient(135deg, var(--sage), var(--sage-dark));border-radius:var(--radius-lg);padding:2rem;color:white;text-align:center;display:flex;flex-direction:column;justify-content:center;">
+          <h4 style="color:white;margin-bottom:0.5rem;">Prefer to Call?</h4>
+          <p style="color:rgba(255,255,255,0.9);font-size:0.95rem;margin-bottom:1.25rem;">We're happy to chat and answer any questions.</p>
+          <a href="tel:0715787180" class="btn btn--white">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.88.36 1.75.7 2.57.13.32.06.68-.18.92l-1.26 1.26a16 16 0 006 6l1.26-1.26c.24-.24.6-.31.92-.18.82.34 1.69.57 2.57.7A2 2 0 0122 16.92z"/></svg>
+            071 578 7180
+          </a>
         </div>
       </div>
     </div>
@@ -300,6 +246,5 @@
   </footer>
 
   <script src="js/main.js"></script>
-  <script src="js/contact.js"></script>
 </body>
 </html>

@@ -17,12 +17,15 @@
   var ADMIN_PASSWORD = 'NurturyAdmin2025';
   var SESSION_KEY = 'nurtury_admin';
   var EDITS_KEY = 'nurtury_edits';
-  var IMAGES_KEY = 'nurtury_images';
+  var IMG_DB_NAME = 'NurturyImagesDB';
+  var IMG_DB_VERSION = 1;
+  var IMG_STORE_NAME = 'images';
   var CLICK_THRESHOLD = 5;
   var CLICK_TIMEOUT = 3000;
 
   // Admin state
   var clickCount = 0;
+  var imgDb = null;
   var clickTimer = null;
 
   // Expose admin state globally so gallery.js can read it
@@ -38,8 +41,17 @@
   document.addEventListener('DOMContentLoaded', init);
 
   function init() {
+    // Clear old index-based edit data (one-time migration to path-based keys)
+    var migrationKey = 'nurtury_edits_v2';
+    if (!localStorage.getItem(migrationKey)) {
+      localStorage.removeItem(EDITS_KEY);
+      localStorage.setItem(migrationKey, '1');
+    }
+
     restoreSavedEdits();
-    restoreSavedImages();
+    openImgDatabase(function () {
+      restoreSavedImages();
+    });
     initNavScroll();
     initActiveNavLink();
     initHamburgerMenu();
@@ -50,6 +62,83 @@
     initSecretAdmin();
     checkAdminSession();
     markPageLoaded();
+  }
+
+  // ----------------------------------------
+  // INDEXEDDB FOR IMAGES
+  // ----------------------------------------
+  function openImgDatabase(callback) {
+    var request = indexedDB.open(IMG_DB_NAME, IMG_DB_VERSION);
+    request.onupgradeneeded = function (e) {
+      var database = e.target.result;
+      if (!database.objectStoreNames.contains(IMG_STORE_NAME)) {
+        database.createObjectStore(IMG_STORE_NAME, { keyPath: 'key' });
+      }
+    };
+    request.onsuccess = function (e) {
+      imgDb = e.target.result;
+      if (callback) callback();
+    };
+    request.onerror = function () {
+      imgDb = null;
+      if (callback) callback();
+    };
+  }
+
+  function imgDbSave(key, dataUrl, callback) {
+    if (!imgDb) { if (callback) callback(); return; }
+    var tx = imgDb.transaction(IMG_STORE_NAME, 'readwrite');
+    var store = tx.objectStore(IMG_STORE_NAME);
+    store.put({ key: key, data: dataUrl });
+    tx.oncomplete = function () { if (callback) callback(); };
+    tx.onerror = function () { if (callback) callback(); };
+  }
+
+  function imgDbGet(key, callback) {
+    if (!imgDb) { callback(null); return; }
+    var tx = imgDb.transaction(IMG_STORE_NAME, 'readonly');
+    var store = tx.objectStore(IMG_STORE_NAME);
+    var request = store.get(key);
+    request.onsuccess = function () {
+      callback(request.result ? request.result.data : null);
+    };
+    request.onerror = function () { callback(null); };
+  }
+
+  function imgDbGetAllForPage(pageKey, callback) {
+    if (!imgDb) { callback({}); return; }
+    var tx = imgDb.transaction(IMG_STORE_NAME, 'readonly');
+    var store = tx.objectStore(IMG_STORE_NAME);
+    var request = store.getAll();
+    request.onsuccess = function () {
+      var result = {};
+      var prefix = pageKey + '::';
+      (request.result || []).forEach(function (item) {
+        if (item.key.indexOf(prefix) === 0) {
+          var imgKey = item.key.substring(prefix.length);
+          result[imgKey] = item.data;
+        }
+      });
+      callback(result);
+    };
+    request.onerror = function () { callback({}); };
+  }
+
+  function imgDbDeleteForPage(pageKey, callback) {
+    if (!imgDb) { if (callback) callback(); return; }
+    var tx = imgDb.transaction(IMG_STORE_NAME, 'readwrite');
+    var store = tx.objectStore(IMG_STORE_NAME);
+    var request = store.getAll();
+    request.onsuccess = function () {
+      var prefix = pageKey + '::';
+      (request.result || []).forEach(function (item) {
+        if (item.key.indexOf(prefix) === 0) {
+          store.delete(item.key);
+        }
+      });
+    };
+    tx.oncomplete = function () { if (callback) callback(); };
+    tx.onerror = function () { if (callback) callback(); };
   }
 
   // ----------------------------------------
@@ -509,54 +598,82 @@
   }
 
   // --- SAVE / RESTORE EDITS ---
-  function getEditableId(el, index) {
-    // Create a stable identifier: tag + classes + position
-    var tag = el.tagName.toLowerCase();
-    var cls = Array.from(el.classList)
-      .filter(function (c) { return c !== 'nurtury-editable' && c !== 'nurtury-editing' && c !== 'visible' && c !== 'fade-in-up'; })
-      .sort().join('.');
-    return tag + (cls ? '.' + cls : '') + '#' + index;
+  function getElementPath(el) {
+    // Generate a stable DOM path as unique key (e.g. "section[2]>div[0]>h2[0]")
+    var path = [];
+    var node = el;
+    while (node && node !== document.body && node !== document.documentElement) {
+      var parent = node.parentElement;
+      if (!parent) break;
+      var siblings = Array.from(parent.children);
+      var index = siblings.indexOf(node);
+      path.unshift(node.tagName.toLowerCase() + '[' + index + ']');
+      node = parent;
+    }
+    return path.join('>');
   }
 
   function saveAllEdits() {
     var pageKey = getPageKey();
 
-    // Save text edits
+    // Save text edits (small data, localStorage is fine)
     var edits = {};
     var allEditable = document.querySelectorAll(EDITABLE_SELECTORS);
-    var idx = 0;
     allEditable.forEach(function (el) {
       if (shouldSkip(el)) return;
-      var id = getEditableId(el, idx);
+      var id = getElementPath(el);
       edits[id] = el.innerHTML;
-      idx++;
     });
 
     var allEditsData = {};
     try { allEditsData = JSON.parse(localStorage.getItem(EDITS_KEY)) || {}; } catch (e) { allEditsData = {}; }
     allEditsData[pageKey] = edits;
-    localStorage.setItem(EDITS_KEY, JSON.stringify(allEditsData));
+    try {
+      localStorage.setItem(EDITS_KEY, JSON.stringify(allEditsData));
+    } catch (e) {
+      showToast('Error: Could not save text edits. Try clearing old data.');
+      return;
+    }
 
-    // Save image replacements
-    var imageEdits = {};
+    // Save image replacements to IndexedDB (large data, unlimited storage)
     var allPlaceholders = document.querySelectorAll('.placeholder-img');
     var imgIdx = 0;
+    var saveCount = 0;
+    var totalToSave = 0;
+
+    // Count how many images need saving
+    allPlaceholders.forEach(function (img) {
+      if (img.closest('.gallery-item') || img.closest('.gallery-grid') || img.closest('.lightbox')) return;
+      var dataUrl = img.getAttribute('data-custom-image');
+      if (dataUrl) totalToSave++;
+      imgIdx++;
+    });
+
+    if (totalToSave === 0) {
+      showToast('Changes saved!');
+      return;
+    }
+
+    imgIdx = 0;
     allPlaceholders.forEach(function (img) {
       if (img.closest('.gallery-item') || img.closest('.gallery-grid') || img.closest('.lightbox')) return;
       var dataUrl = img.getAttribute('data-custom-image');
       if (dataUrl) {
-        imageEdits['img#' + imgIdx] = dataUrl;
+        var dbKey = pageKey + '::img#' + imgIdx;
+        imgDbSave(dbKey, dataUrl, function () {
+          saveCount++;
+          if (saveCount >= totalToSave) {
+            showToast('Changes saved!');
+          }
+        });
       }
       imgIdx++;
     });
 
-    var allImageData = {};
-    try { allImageData = JSON.parse(localStorage.getItem(IMAGES_KEY)) || {}; } catch (e) { allImageData = {}; }
-    allImageData[pageKey] = imageEdits;
-    localStorage.setItem(IMAGES_KEY, JSON.stringify(allImageData));
-
-    // Show save confirmation
-    showToast('Changes saved!');
+    // If no images but text was saved
+    if (totalToSave === 0) {
+      showToast('Changes saved!');
+    }
   }
 
   function restoreSavedEdits() {
@@ -568,25 +685,30 @@
     if (!edits) return;
 
     var allEditable = document.querySelectorAll(EDITABLE_SELECTORS);
-    var idx = 0;
     allEditable.forEach(function (el) {
       if (shouldSkip(el)) return;
-      var id = getEditableId(el, idx);
+      var id = getElementPath(el);
       if (edits[id] !== undefined) {
         el.innerHTML = edits[id];
       }
-      idx++;
     });
   }
 
   function restoreSavedImages() {
     var pageKey = getPageKey();
-    var allImageData = {};
-    try { allImageData = JSON.parse(localStorage.getItem(IMAGES_KEY)) || {}; } catch (e) { return; }
 
-    var imageEdits = allImageData[pageKey];
-    if (!imageEdits) return;
+    imgDbGetAllForPage(pageKey, function (imageEdits) {
+      if (!imageEdits || Object.keys(imageEdits).length === 0) {
+        // Try migrating old localStorage data
+        migrateOldImageData(pageKey);
+        return;
+      }
 
+      applyImageEdits(imageEdits);
+    });
+  }
+
+  function applyImageEdits(imageEdits) {
     var allPlaceholders = document.querySelectorAll('.placeholder-img');
     var imgIdx = 0;
     allPlaceholders.forEach(function (img) {
@@ -598,7 +720,6 @@
         img.style.backgroundPosition = 'center';
         img.classList.add('nurtury-has-image');
         img.setAttribute('data-custom-image', imageEdits[key]);
-        // Hide placeholder content
         Array.from(img.children).forEach(function (child) {
           child.style.display = 'none';
         });
@@ -607,23 +728,48 @@
     });
   }
 
+  function migrateOldImageData(pageKey) {
+    // Migrate from old localStorage if it exists
+    try {
+      var allImageData = JSON.parse(localStorage.getItem('nurtury_images')) || {};
+      var imageEdits = allImageData[pageKey];
+      if (!imageEdits) return;
+
+      // Save each image to IndexedDB
+      Object.keys(imageEdits).forEach(function (imgKey) {
+        var dbKey = pageKey + '::' + imgKey;
+        imgDbSave(dbKey, imageEdits[imgKey]);
+      });
+
+      // Apply immediately
+      applyImageEdits(imageEdits);
+
+      // Clean up old data for this page
+      delete allImageData[pageKey];
+      if (Object.keys(allImageData).length === 0) {
+        localStorage.removeItem('nurtury_images');
+      } else {
+        localStorage.setItem('nurtury_images', JSON.stringify(allImageData));
+      }
+    } catch (e) { /* ignore */ }
+  }
+
   function resetPageEdits() {
     if (!confirm('Reset all edits on this page to defaults? This cannot be undone.')) return;
 
     var pageKey = getPageKey();
 
+    // Clear text edits from localStorage
     var allEditsData = {};
     try { allEditsData = JSON.parse(localStorage.getItem(EDITS_KEY)) || {}; } catch (e) { allEditsData = {}; }
     delete allEditsData[pageKey];
     localStorage.setItem(EDITS_KEY, JSON.stringify(allEditsData));
 
-    var allImageData = {};
-    try { allImageData = JSON.parse(localStorage.getItem(IMAGES_KEY)) || {}; } catch (e) { allImageData = {}; }
-    delete allImageData[pageKey];
-    localStorage.setItem(IMAGES_KEY, JSON.stringify(allImageData));
-
-    showToast('Page reset! Reloading...');
-    setTimeout(function () { location.reload(); }, 800);
+    // Clear images from IndexedDB
+    imgDbDeleteForPage(pageKey, function () {
+      showToast('Page reset! Reloading...');
+      setTimeout(function () { location.reload(); }, 800);
+    });
   }
 
   // --- TOAST NOTIFICATION ---
